@@ -1,17 +1,23 @@
-#version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
+#version 330
 
+layout(location = 0) in vec3 Position;
+
+// Uniforms
 uniform mat4 gVP;
 uniform mat4 gModel;
 
-out vec3 FragPos;
+// Outputs to fragment shader
+out vec3 WorldPos;
 out vec3 Normal;
 
 void main()
 {
-    FragPos = vec3(gModel * vec4(aPos, 1.0));
-    Normal = mat3(transpose(inverse(gModel))) * aNormal;
-    gl_Position = gVP * vec4(FragPos, 1.0);
-} 
+    vec4 WorldPosition = gModel * vec4(Position, 1.0);
+    WorldPos = WorldPosition.xyz;
+    gl_Position = gVP * WorldPosition;
+    
+    // Calculate normal from model matrix (assuming uniform scaling)
+    // For a cube, we can derive normal from the vertex position
+    Normal = normalize((gModel * vec4(normalize(Position), 0.0)).xyz);
+}
