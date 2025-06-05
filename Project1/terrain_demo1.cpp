@@ -420,10 +420,10 @@ public:
 
         m_cubeTech.Enable();
 
-        // Set lighting parameters (same as terrain)
+        // Set lighting parameters
         m_cubeTech.SetReversedLightDir(lightDir);
         m_cubeTech.SetSecondLightDir(secondLightDir);
-        m_cubeTech.SetSecondLightColor(Vector3f(0.8f, 0.2f, 0.2f)); // Red light color
+        m_cubeTech.SetSecondLightColor(Vector3f(0.8f, 0.2f, 0.2f));
         m_cubeTech.SetMainLightIntensity(mainLightIntensity);
         m_cubeTech.SetSecondLightIntensity(secondLightIntensity);
 
@@ -432,9 +432,7 @@ public:
 
         glBindVertexArray(m_VAO);
 
-        // Fuselage - główny korpus samolotu
-        m_cubeTech.SetColor(0.8f, 0.8f, 0.9f);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        // ZMIENIONA KOLEJNOŚĆ - najpierw skrzydła, potem fuselage (żeby fuselage był na wierzchu)
 
         // Right Wing
         m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
@@ -444,8 +442,12 @@ public:
         m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(72 * sizeof(unsigned int)));
 
-        // Horizontal Tail
+        // Fuselage - główny korpus samolotu (renderowany po skrzydłach)
         m_cubeTech.SetColor(0.8f, 0.8f, 0.9f);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+        // Horizontal Tail
+        m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(108 * sizeof(unsigned int)));
 
         // Vertical Tail
@@ -453,7 +455,7 @@ public:
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(144 * sizeof(unsigned int)));
 
         // Nose/Dziób
-        m_cubeTech.SetColor(0.8f, 0.8f, 0.9f);
+        m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(180 * sizeof(unsigned int)));
 
         glBindVertexArray(0);
@@ -498,10 +500,10 @@ private:
         const float vt_y_pos = hf_hgt - 0.02f;
 
         // Nose/Dziób - Połączony z fuselage
-        const float nose_length = 0.5f;
-        const float nose_width = f_wid * 0.8f; // Proporcjonalny do fuselage
-        const float nose_height = f_hgt * 0.8f;
-        const float nose_z_pos = hf_len + nose_length / 2.0f - 0.05f; // Lekko nakładający się
+        const float nose_length = 0.8f;
+        const float nose_width = f_wid * 0.7f; // Proporcjonalny do fuselage
+        const float nose_height = f_hgt * 0.7f;
+        const float nose_z_pos = hf_len + nose_length / 2.0f + 0.1f; // Lekko nakładający się
 
         std::vector<float> vertices;
         std::vector<unsigned int> indices;
@@ -544,6 +546,38 @@ private:
                     indices.push_back(front2);
                     indices.push_back(back1);
                     indices.push_back(back2);
+                }
+                Vector3f front_center = center + Vector3f(0, 0, half_dims.z);
+                Vector3f back_center = center - Vector3f(0, 0, half_dims.z);
+
+                // Przednia ściana - wentylator trójkątów z centrum
+                unsigned int front_center_idx = vertices.size() / 3;
+                vertices.push_back(front_center.x);
+                vertices.push_back(front_center.y);
+                vertices.push_back(front_center.z);
+
+                for (int i = 0; i < segments; ++i) {
+                    int curr_front = currentVertexOffset + i * 2;
+                    int next_front = currentVertexOffset + ((i + 1) % (segments + 1)) * 2;
+
+                    indices.push_back(front_center_idx);
+                    indices.push_back(curr_front);
+                    indices.push_back(next_front);
+                }
+
+                // Tylna ściana - wentylator trójkątów z centrum
+                unsigned int back_center_idx = vertices.size() / 3;
+                vertices.push_back(back_center.x);
+                vertices.push_back(back_center.y);
+                vertices.push_back(back_center.z);
+
+                for (int i = 0; i < segments; ++i) {
+                    int curr_back = currentVertexOffset + i * 2 + 1;
+                    int next_back = currentVertexOffset + ((i + 1) % (segments + 1)) * 2 + 1;
+
+                    indices.push_back(back_center_idx);
+                    indices.push_back(next_back);  // Odwrócona kolejność dla tylnej ściany
+                    indices.push_back(curr_back);
                 }
 
             }
@@ -598,10 +632,10 @@ private:
         AddRoundedCuboid(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(hf_wid, hf_hgt, hf_len), 8);
 
         // Right Wing
-        AddCuboid(Vector3f(hf_wid + w_span_each / 2.0f - 0.05f, 0.0f, wing_z_offset),
+        AddCuboid(Vector3f(hf_wid + w_span_each / 2.0f-0.05f, 0.0f, wing_z_offset),
             Vector3f(w_span_each / 2.0f, hw_thick, hw_chord));
 
-        // Left Wing
+        // Left Wing - przesunięte bardziej na zewnątrz
         AddCuboid(Vector3f(-(hf_wid + w_span_each / 2.0f - 0.05f), 0.0f, wing_z_offset),
             Vector3f(w_span_each / 2.0f, hw_thick, hw_chord));
 
