@@ -1,0 +1,22 @@
+﻿  terrain_demo1.cpp
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(217,19): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(220,25): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(366,41): warning C4305: "argument": obcięcie z "double" do "float"
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(425,46): warning C4267: "inicjowanie": konwersja z "size_t" do "unsigned int", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(431,33): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(535,41): warning C4267: "=": konwersja z "size_t" do "unsigned int", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(710,25): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(824,24): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(831,24): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(838,24): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(889,23): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(897,78): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(960,66): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(964,67): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(968,65): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(972,66): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(976,67): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\Project1\terrain_demo1.cpp(980,66): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+  Project1.vcxproj -> C:\Users\Właściciel\OneDrive\Pulpit\ProjektGrafika\x64\Debug\Project1.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
