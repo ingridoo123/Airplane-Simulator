@@ -1,91 +1,94 @@
-# Terrain Rendering with Airplane Simulation
+# Renderowanie Terenu z Symulacją Samolotu
 
-## Overview
-This project is a 3D terrain rendering application with an interactive airplane simulation. The terrain generation was inspired by the OGLDEV YouTube channel tutorials, which provided valuable insights into terrain rendering techniques.
+## Opis projektu
+Ten projekt to aplikacja do renderowania terenu 3D z interaktywną symulacją lotu samolotu. Generowanie terenu zostało zainspirowane poradnikami z kanału YouTube OGLDEV, które dostarczyły cennych informacji o technikach renderowania terenu.
 
-## Technologies Used
+## Użyte technologie
 - OpenGL 3.3+
-- GLFW for window management
-- GLEW for OpenGL extension loading
-- ImGui for user interface
-- C++ for core functionality
+- GLFW – obsługa okna
+- GLEW – ładowanie rozszerzeń OpenGL
+- ImGui – interfejs użytkownika
+- C++ – główna logika programu
 
-## Features
-- Procedurally generated terrain using midpoint displacement algorithm
-- Interactive airplane simulation with realistic controls
-- Dynamic camera system with multiple viewing modes
-- Bird flocking simulation
-- Real-time lighting and shading
-- Customizable terrain parameters
-- Interactive GUI for real-time adjustments
+## Funkcje
+- Proceduralnie generowany teren za pomocą algorytmu przesunięcia środka (midpoint displacement)
 
-## Controls
+- Interaktywna symulacja lotu samolotu z realistycznym sterowaniem
 
-### Camera Modes
-- Press `F` to toggle free camera mode
-- Press `T` to enter airplane-following camera mode
+- Dynamiczny system kamery z wieloma trybami widoku
 
-### Airplane Controls (when in airplane-following mode)
-- `W` - Move forward
-- `S` - Move backward
-- `A` - Move left
-- `D` - Move right
-- `+` - Move up
-- `-` - Move down
-- `V/B` - Rotate left/right
-- `N/M` - Pitch up/down
-- `K/L` - Roll left/right
+- Symulacja stada ptaków (flocking)
 
-### General Controls
-- `ESC` or `Q` - Exit application
-- `R` - Reset camera position
-- `C` - Print camera position
-- `E` - Toggle wireframe mode
-- `P` - Pause simulation
-- `SPACE` - Toggle GUI
-- `0` - Toggle point display
-- `1/2/3` - Change cube follow mode
+- Oświetlenie i cieniowanie w czasie rzeczywistym
 
-## Customization Options
+- Możliwość dostosowania parametrów terenu
+
+- Interaktywne GUI do regulacji parametrów podczas działania programu
+
+## Sterowanie
+
+### Tryby kamery
+-  `F` przełączenie na tryb swobodnej kamery
+-  `T`  tryb podążania za samolotem
+
+### Sterowanie samolotem (w trybie podążania kamery)
+- `W` - do przodu
+- `S` - do tyłu
+- `A` - w lewo
+- `D` - w prawo
+- `+` - w górę
+- `-` - w dół 
+- `V/B` - obrót w lewo/prawo
+- `N/M` - pochylenie w górę/dół
+
+### Ogólne sterowanie
+- `ESC` lub `Q` - wyjście z aplikacji
+- `R` - resetowanie pozycji kamery
+- `C` - wypisanie pozycji kamery
+- `E` - przełączenie trybu siatki (wireframe)
+- `P` - pauza symulacji
+- `SPACE` - przełączenie GUI
+- `0` - przełączenie wyświetlania punktów
+- `1/2/3` - zmiana trybu śledzenia kostki
+
+## Opcje personalizacji
 
 ### Terrain
-- Adjust terrain size in `terrain_demo1.cpp`:
-  - Modify `m_terrainSize` (default: 513)
-  - Change `m_roughness` for different terrain patterns
-  - Adjust `m_minHeight` and `m_maxHeight` for elevation range
+- Dostosuj rozmiar terenu w pliku `terrain_demo1.cpp`:
+  - Zmień wartość  `m_terrainSize`
+  - Zmień `m_roughness` , aby uzyskać różne wzory terenu
+  -Dostosuj  `m_minHeight` i `m_maxHeight` , by zmienić zakres wysokości
 
-### Birds
-- Modify bird count in `InitBirds()` function
-- Adjust bird speed and behavior in the `Bird` class
-- Change bird appearance by modifying the `RenderBirdPart` function
+### Ptaki
+- Liczba ptaków: funkcja `InitBirds()` 
+- Prędkość i zachowanie: klasa `Bird`
+- Wygląd ptaków: funkcja `RenderBirdPart` 
 
-### Lighting
-- Adjust light direction in `InitTerrain()` function
-- Modify light intensity and color in `terrain.fs` shader
+### Oświetlenie
+- Intensywność i kolor: shader `terrain.fs` 
 - Customize ambient and diffuse lighting parameters
 
 ### Airplane
-- Change airplane size by modifying `cubeSize` in `InitPlayerCube()`
-- Adjust airplane speed by changing `m_cubeSpeed`
-- Modify camera distance and height offset in `SetCameraBehindCubeFixed()`
+- Rozmiar samolotu: zmień `cubeSize` w `InitPlayerCube()`
+- Prędkość: zmień `m_cubeSpeed`
+- Dystans i wysokość kamery za samolotem: `SetCameraBehindCubeFixed()`
 
-## Development Notes
-- The project uses modern OpenGL practices with shader-based rendering
-- Terrain generation uses the midpoint displacement algorithm for natural-looking landscapes
-- The airplane simulation includes realistic physics and collision detection
-- The bird flocking system implements basic flocking behavior
+## Informacje dla deweloperów
+- Projekt wykorzystuje nowoczesne podejście do OpenGL z użyciem shaderów
+- Generowanie terenu opiera się na algorytmie przesunięcia środka, zapewniającym naturalny wygląd krajobrazu
+- Symulacja samolotu obejmuje realistyczną fizykę i detekcję kolizji
+- System stada ptaków wykorzystuje podstawowe zasady zachowania grupowego
 
-## Requirements
-- C++ compiler with C++11 support
-- OpenGL 3.3 or higher
-- GLFW 3.x
-- GLEW
-- ImGui
+## Wymagania
+-Kompilator C++ z obsługą C++11
+-OpenGL 3.3 lub wyższy
+-GLFW 3.x
+-GLEW
+-ImGui
 
-## Building
-1. Ensure all dependencies are installed
-2. Compile using your preferred build system
-3. Run the executable
+## Budowanie projektu
+1. Upewnij się, że wszystkie zależności są zainstalowane
+2. Skompiluj projekt za pomocą pliku .sln w VS2022
 
 ## Credits
 - Terrain generation techniques inspired by OGLDEV YouTube channel
