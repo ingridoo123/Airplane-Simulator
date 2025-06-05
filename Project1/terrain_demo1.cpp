@@ -1,4 +1,4 @@
-﻿#include "imgui.h"
+#include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <algorithm>
@@ -20,8 +20,8 @@
 #include "texture_config.h"
 #include "midpoint_disp_terrain.h"
 
-#define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH  2560
+#define WINDOW_HEIGHT 1440
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -37,7 +37,6 @@ class CubeTechnique
 {
 public:
     CubeTechnique() : m_shaderProg(0) {}
-
     ~CubeTechnique() {
         if (m_shaderProg != 0) {
             glDeleteProgram(m_shaderProg);
@@ -45,30 +44,73 @@ public:
     }
 
     bool Init() {
-        // Vertex shader source
+        // Load airplane vertex shader
         const char* vertexShaderSource = R"(
-        #version 330 core
-        layout (location = 0) in vec3 aPos;
+        #version 330
+        layout(location = 0) in vec3 Position;
         
+        // Uniforms
         uniform mat4 gVP;
         uniform mat4 gModel;
         
+        // Outputs to fragment shader
+        out vec3 WorldPos;
+        out vec3 Normal;
+        
         void main()
         {
-            gl_Position = gVP * gModel * vec4(aPos, 1.0);
+            vec4 WorldPosition = gModel * vec4(Position, 1.0);
+            WorldPos = WorldPosition.xyz;
+            gl_Position = gVP * WorldPosition;
+            
+            // Calculate normal from model matrix (assuming uniform scaling)
+            // For a cube, we can derive normal from the vertex position
+            Normal = normalize((gModel * vec4(normalize(Position), 0.0)).xyz);
         }
         )";
 
-        // Fragment shader source
+        // Load airplane fragment shader
         const char* fragmentShaderSource = R"(
-        #version 330 core
-        out vec4 FragColor;
+        #version 330
+        layout(location = 0) out vec4 FragColor;
         
-        uniform vec3 gColor;
+        // Inputs from vertex shader
+        in vec3 WorldPos;
+        in vec3 Normal;
+        
+        // Uniform variables for lighting (same as terrain)
+        uniform vec3 gReversedLightDir;
+        uniform vec3 gSecondLightDir;
+        uniform vec3 gSecondLightColor = vec3(0.8, 0.2, 0.2);
+        uniform float gMainLightIntensity = 0.5;
+        uniform float gSecondLightIntensity = 0.0;
+        
+        // Uniform for airplane color (set by SetColor)
+        uniform vec3 gAirplaneColor = vec3(0.8, 0.8, 0.9);
         
         void main()
         {
-            FragColor = vec4(gColor, 1.0);
+            vec3 Normal_ = normalize(Normal);
+            
+            // First light (main sun) - same calculation as terrain
+            float Diffuse1 = dot(Normal_, gReversedLightDir);
+            Diffuse1 = max(0.6f, Diffuse1);
+            float Ambient = 0.4f;
+            Diffuse1 = (Diffuse1 + Ambient) * gMainLightIntensity;
+            
+            // Second light (red sun) - same calculation as terrain
+            float Diffuse2 = dot(Normal_, gSecondLightDir);
+            Diffuse2 = max(0.3f, Diffuse2);
+            Diffuse2 = Diffuse2 * gSecondLightIntensity;
+            
+            // Combine both lights with airplane color
+            vec3 FinalColor = gAirplaneColor * (Diffuse1 + Diffuse2 * gSecondLightColor);
+            
+            // Ensure minimum visibility even in complete darkness
+            float MinBrightness = 0.1f;
+            FinalColor = max(FinalColor, gAirplaneColor * MinBrightness);
+            
+            FragColor = vec4(FinalColor, 1.0);
         }
         )";
 
@@ -123,7 +165,14 @@ public:
         // Get uniform locations
         m_vpLoc = glGetUniformLocation(m_shaderProg, "gVP");
         m_modelLoc = glGetUniformLocation(m_shaderProg, "gModel");
-        m_colorLoc = glGetUniformLocation(m_shaderProg, "gColor");
+        m_colorLoc = glGetUniformLocation(m_shaderProg, "gAirplaneColor");
+
+        // Get lighting uniform locations
+        m_reversedLightDirLoc = glGetUniformLocation(m_shaderProg, "gReversedLightDir");
+        m_secondLightDirLoc = glGetUniformLocation(m_shaderProg, "gSecondLightDir");
+        m_secondLightColorLoc = glGetUniformLocation(m_shaderProg, "gSecondLightColor");
+        m_mainLightIntensityLoc = glGetUniformLocation(m_shaderProg, "gMainLightIntensity");
+        m_secondLightIntensityLoc = glGetUniformLocation(m_shaderProg, "gSecondLightIntensity");
 
         return true;
     }
@@ -148,11 +197,39 @@ public:
         glUniform3f(m_colorLoc, r, g, b);
     }
 
+    // New lighting methods - you'll need to call these to set lighting parameters
+    void SetReversedLightDir(const Vector3f& dir) {
+        glUniform3f(m_reversedLightDirLoc, dir.x, dir.y, dir.z);
+    }
+
+    void SetSecondLightDir(const Vector3f& dir) {
+        glUniform3f(m_secondLightDirLoc, dir.x, dir.y, dir.z);
+    }
+
+    void SetSecondLightColor(const Vector3f& color) {
+        glUniform3f(m_secondLightColorLoc, color.x, color.y, color.z);
+    }
+
+    void SetMainLightIntensity(float intensity) {
+        glUniform1f(m_mainLightIntensityLoc, intensity);
+    }
+
+    void SetSecondLightIntensity(float intensity) {
+        glUniform1f(m_secondLightIntensityLoc, intensity);
+    }
+
 private:
     GLuint m_shaderProg;
     GLint m_vpLoc;
     GLint m_modelLoc;
     GLint m_colorLoc;
+
+    // Lighting uniform locations
+    GLint m_reversedLightDirLoc;
+    GLint m_secondLightDirLoc;
+    GLint m_secondLightColorLoc;
+    GLint m_mainLightIntensityLoc;
+    GLint m_secondLightIntensityLoc;
 };
 
 // Modern PlayerCube class
@@ -321,13 +398,14 @@ public:
         while (m_rotationZ < 0.0f) m_rotationZ += 360.0f;
     }
 
-    void Render(const Matrix4f& VP)
+    void Render(const Matrix4f& VP, const Vector3f& lightDir, const Vector3f& secondLightDir,
+        float mainLightIntensity, float secondLightIntensity)
     {
         Matrix4f translation;
         translation.InitTranslationTransform(m_position.x, m_position.y, m_position.z);
 
         Matrix4f rotationY;
-        rotationY.InitRotateTransform(0.0f, m_rotation + 180.0f, 0.0f); // Dodaj +180 stopni aby obrócić samolot
+        rotationY.InitRotateTransform(0.0f, m_rotation + 180.0f, 0.0f);
 
         Matrix4f rotationX;
         rotationX.InitRotateTransform(m_rotationX, 0.0f, 0.0f);
@@ -341,6 +419,14 @@ public:
         Matrix4f modelMatrix = translation * rotationY * rotationX * rotationZ * scale;
 
         m_cubeTech.Enable();
+
+        // Set lighting parameters (same as terrain)
+        m_cubeTech.SetReversedLightDir(lightDir);
+        m_cubeTech.SetSecondLightDir(secondLightDir);
+        m_cubeTech.SetSecondLightColor(Vector3f(0.8f, 0.2f, 0.2f)); // Red light color
+        m_cubeTech.SetMainLightIntensity(mainLightIntensity);
+        m_cubeTech.SetSecondLightIntensity(secondLightIntensity);
+
         m_cubeTech.SetVP(VP);
         m_cubeTech.SetModel(modelMatrix);
 
@@ -350,25 +436,25 @@ public:
         m_cubeTech.SetColor(0.8f, 0.8f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-        // Right Wing - =
+        // Right Wing
         m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
 
-        // Left Wing - =
+        // Left Wing
         m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(72 * sizeof(unsigned int)));
 
-        // Horizontal Tail - =
+        // Horizontal Tail
         m_cubeTech.SetColor(0.8f, 0.8f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(108 * sizeof(unsigned int)));
 
-        // Vertical Tail - =
-        m_cubeTech.SetColor(0.3f, 0.5f, 0.9);
+        // Vertical Tail
+        m_cubeTech.SetColor(0.3f, 0.5f, 0.9f);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(144 * sizeof(unsigned int)));
 
-        // Nose/Dziób - =
+        // Nose/Dziób
         m_cubeTech.SetColor(0.8f, 0.8f, 0.9f);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(180 * sizeof(unsigned int))); // Nowy element
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)(180 * sizeof(unsigned int)));
 
         glBindVertexArray(0);
         glUseProgram(0);
@@ -1072,10 +1158,15 @@ public:
 
         // Render terrain first
         m_terrain.Render(*m_pGameCamera);
-
-        // Render the cube
+        // In your constructor or Init() function:
+        m_reversedLightDir = Vector3f(1.0f, 1.0f, 0.0f);  // Example values
+        m_secondLightDir = Vector3f(-1.0f, 1.0f, 0.0f);   // Example values
+        m_mainLightIntensity = 0.5f;
+        m_secondLightIntensity = 0.0f;
+        // Render the cube with same lighting parameters as terrain
         if (m_pPlayerCube) {
-            m_pPlayerCube->Render(VP);
+            m_pPlayerCube->Render(VP, m_reversedLightDir, m_secondLightDir,
+                m_mainLightIntensity, m_secondLightIntensity);
         }
 
         RenderBirds();
@@ -1332,6 +1423,10 @@ private:
     std::vector<Bird> m_birds;
     CubeTechnique m_birdTechnique;
     GLuint m_birdVAO, m_birdVBO, m_birdEBO;
+    Vector3f m_reversedLightDir;
+    Vector3f m_secondLightDir;
+    float m_mainLightIntensity;
+    float m_secondLightIntensity;
 };
 
 TerrainDemo12* app = NULL;
