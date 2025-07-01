@@ -1,7 +1,7 @@
 # Renderowanie Terenu z Symulacją Samolotu
 
 ## Opis projektu
-Ten projekt to aplikacja do renderowania terenu 3D z interaktywną symulacją lotu samolotu. Generowanie terenu zostało zainspirowane poradnikami z kanału YouTube OGLDEV, które dostarczyły cennych informacji o technikach renderowania terenu.
+Ten projekt to aplikacja do renderowania terenu 3D z interaktywną symulacją lotu samolotu jako projekt na przedmiot Grafika komputerowa i wizualizacja PUT semestr 4. Generowanie terenu zostało zainspirowane poradnikami z kanału YouTube OGLDEV, które dostarczyły cennych informacji o technikach renderowania terenu.
 
 ## Użyte technologie
 - OpenGL 3.3+
